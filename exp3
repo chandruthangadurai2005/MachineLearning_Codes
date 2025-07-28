@@ -1,0 +1,114 @@
+# Regression Coefficients
+intercept = 39.8673
+coefficients = {
+    'CRIM': -0.1204,
+    'ZN': 0.0366,
+    'INDUS': -0.0776,
+    'CHAS': 3.1964,
+    'NOX': -19.7453,
+    'RM': 3.7590,
+    'AGE': 0.0024,
+    'DIS': -1.5043,
+    'RAD': 0.1125,
+    'PTRATIO': -0.9705,
+    'LSTAT': -0.5501
+}
+
+# Two input sets with actual MEDV
+input_data_list = [
+    {
+        'features': {
+            'CRIM': 0.08187,
+            'ZN': 0,
+            'INDUS': 2.89,
+            'CHAS': 0,
+            'NOX': 0.445,
+            'RM': 7.82,
+            'AGE': 36.9,
+            'DIS': 3.4952,
+            'RAD': 2,
+            'PTRATIO': 18,
+            'LSTAT': 3.57
+        },
+        'actual_MEDV': 43.8
+    },
+    {
+        'features': {
+            'CRIM': 0.15876,
+            'ZN': 25,
+            'INDUS': 5.13,
+            'CHAS': 1,
+            'NOX': 0.453,
+            'RM': 6.95,
+            'AGE': 27.9,
+            'DIS': 5.2152,
+            'RAD': 4,
+            'PTRATIO': 17.4,
+            'LSTAT': 6.12
+        },
+        'actual_MEDV': 34.9
+    }
+]
+
+# Predict MEDV for each input
+for idx, entry in enumerate(input_data_list, start=1):
+    features = entry['features']
+    actual_y = entry['actual_MEDV']
+    
+    y_pred = intercept
+    for feature, coef in coefficients.items():
+        y_pred += coef * features[feature]
+    
+    print(f"Input Set {idx}:")
+    print(f"  Predicted MEDV (y): {y_pred:.2f}")
+    print(f"  Actual MEDV:        {actual_y:.2f}")
+    print(f"  Error:              {abs(y_pred - actual_y):.2f}\n")
+
+
+
+X = [2, 3, 5, 4, 6, 1, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+Y = [50, 60, 80, 70, 88, 45, 95, 100, 105, 110, 115, 120, 125, 130, 135]
+n=len(X)
+X_matrix=[[1,X[i]] for i in range(n)]
+Y_matrix=[[Y[i]] for i in range(n)]
+X_transpose=[[X_matrix[j][i] for j in range(n)] for i in range(2)]
+XTX=[[sum(X_transpose[i][k]*X_matrix[k][j] for k in range(n)) for j in range(2)] for i in range(2)]
+XTY=[[sum(X_transpose[i][k]*Y_matrix[k][0] for k in range(n))] for i in range(2)]
+det=XTX[0][0]*XTX[1][1]-XTX[0][1]*XTX[1][0]
+if det==0:
+    raise Exception("Matrix is not invertible!")
+inv_XTX = [
+    [ XTX[1][1] / det, -XTX[0][1] / det],
+    [-XTX[1][0] / det,  XTX[0][0] / det]
+]
+beta=[[inv_XTX[0][0]*XTY[0][0] +inv_XTX[0][1]*XTY[1][0]],[inv_XTX[1][0]*XTY[0][0]+inv_XTX[1][1]*XTY[1][0]]]
+intercept=beta[0][0]
+slope=beta[1][0]
+print("\nX matrix:")
+for row in X_matrix:
+    print(row)
+
+print("\nY matrix:")
+for row in Y_matrix:
+    print(row)
+
+print("\nX^T * X matrix (XTX):")
+for row in XTX:
+    print(row)
+
+print("\nX^T * Y matrix (XTY):")
+for row in XTY:
+    print(row)
+
+print("\nInverse of X^T * X matrix:")
+for row in inv_XTX:
+    print(row)
+
+print("\nBeta (θ) matrix [intercept, slope]:")
+for row in beta:
+    print(row)
+
+print(f"\nIntercept: {intercept:.2f}")
+print(f"Slope: {slope:.2f}")
+
+print(f"\nRegression line: y = {intercept:.2f} + {slope:.2f} * x")
