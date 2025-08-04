@@ -1,4 +1,4 @@
-
+#Logistic regression
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -52,7 +52,7 @@ print("Prediction:", "Pass ✅" if prediction[0] == 1 else "Fail ❌")
 
 
 
-
+#lasso,ridge,ElsticNet regression
 
 
 import numpy as np
