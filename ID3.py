@@ -1,18 +1,41 @@
+CGPA,Interactive,Practical,Communication,JobOffer
+8.5,Yes,Excellent,Good,Yes
+6.2,No,Average,Moderate,No
+7.3,Yes,Good,Poor,Yes
+5.7,No,Average,Poor,No
+9.2,Yes,Excellent,Good,Yes
+6.8,No,Good,Moderate,No
+7.9,Yes,Excellent,Moderate,Yes
+5.4,No,Average,Poor,No
+8.0,Yes,Excellent,Good,Yes
+6.5,No,Average,Moderate,No
+7.6,Yes,Good,Good,Yes
+5.9,No,Average,Poor,No
+8.7,Yes,Excellent,Good,Yes
+6.1,No,Good,Moderate,No
+7.4,Yes,Good,Moderate,Yes
+
+
+
+
+
+
+
+
 import math
 from collections import Counter
 import pprint
+import csv
 
-# Dataset
-data = [
-    {"CGPA": 8.1, "Interactive": "Yes", "Practical": "Very Good", "Communication": "Good", "JobOffer": "Yes"},
-    {"CGPA": 6.5, "Interactive": "No", "Practical": "Avg", "Communication": "Moderate", "JobOffer": "No"},
-    {"CGPA": 7.2, "Interactive": "Yes", "Practical": "Good", "Communication": "Poor", "JobOffer": "Yes"},
-    {"CGPA": 5.8, "Interactive": "No", "Practical": "Avg", "Communication": "Poor", "JobOffer": "No"},
-    {"CGPA": 9.0, "Interactive": "Yes", "Practical": "Very Good", "Communication": "Good", "JobOffer": "Yes"},
-    {"CGPA": 6.0, "Interactive": "No", "Practical": "Good", "Communication": "Moderate", "JobOffer": "No"},
-    {"CGPA": 7.8, "Interactive": "Yes", "Practical": "Very Good", "Communication": "Moderate", "JobOffer": "Yes"},
-    {"CGPA": 5.5, "Interactive": "No", "Practical": "Avg", "Communication": "Poor", "JobOffer": "No"},
-]
+# Load dataset from CSV
+def load_dataset(filename):
+    data = []
+    with open(filename, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            row["CGPA"] = float(row["CGPA"])
+            data.append(row)
+    return data
 
 # Discretize CGPA
 def discretize_cgpa(cgpa):
@@ -22,9 +45,6 @@ def discretize_cgpa(cgpa):
         return "Medium"
     else:
         return "Low"
-
-for record in data:
-    record["CGPA"] = discretize_cgpa(record["CGPA"])
 
 # Entropy
 def entropy(data_subset):
@@ -76,11 +96,6 @@ def id3(data_subset, attributes):
             tree[best_attr][val] = id3(subset, remaining_attrs)
     return tree
 
-# Build tree
-attributes = ["CGPA", "Interactive", "Practical", "Communication"]
-decision_tree = id3(data, attributes)
-pprint.pprint(decision_tree)
-
 # Prediction
 def predict(tree, sample, default_class=None):
     if not isinstance(tree, dict):
@@ -92,12 +107,25 @@ def predict(tree, sample, default_class=None):
     else:
         return default_class
 
-# Example prediction
-new_sample = {
-    "CGPA": discretize_cgpa(7.0),
-    "Interactive": "Yes",
-    "Practical": "Good",
-    "Communication": "Moderate"
-}
-prediction = predict(decision_tree, new_sample, default_class=majority_class(data))
-print(f"Predicted JobOffer: {prediction}")
+if __name__ == "__main__":
+    # Load and preprocess dataset
+    data = load_dataset("students_dataset.csv")
+    for record in data:
+        record["CGPA"] = discretize_cgpa(record["CGPA"])
+
+    # Build decision tree
+    attributes = ["CGPA", "Interactive", "Practical", "Communication"]
+    decision_tree = id3(data, attributes)
+
+    print("Decision Tree:")
+    pprint.pprint(decision_tree)
+
+    # Test prediction
+    new_sample = {
+        "CGPA": discretize_cgpa(7.0),
+        "Interactive": "Yes",
+        "Practical": "Good",
+        "Communication": "Moderate"
+    }
+    prediction = predict(decision_tree, new_sample, default_class=majority_class(data))
+    print(f"\nPredicted JobOffer for {new_sample}: {prediction}")
